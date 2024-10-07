@@ -15,6 +15,6 @@ export class TournamentPlayers {
     @JoinColumn({ name: 'user_id'})
     user: User;
 
-    @Column()
+    @Column({ default: 0 })
     points: number;
 }

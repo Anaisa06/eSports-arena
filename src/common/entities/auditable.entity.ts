@@ -1,5 +1,5 @@
 import { User } from "src/users/entities/user.entity";
-import { CreateDateColumn, JoinColumn, ManyToOne, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, JoinColumn, ManyToOne, UpdateDateColumn } from "typeorm";
 
 export abstract class AuditableEntity {
     @CreateDateColumn({
@@ -19,6 +19,13 @@ export abstract class AuditableEntity {
     })
     updatedAt: Date;
 
+    @DeleteDateColumn({
+        name: 'deleted_at',
+        type: 'timestamptz',
+        select: false,
+    })
+    deletedAt: Date;
+
     @ManyToOne(() => User, { nullable: true })
     @JoinColumn({ name: 'created_by' })
     createdBy?: User;
@@ -27,4 +34,7 @@ export abstract class AuditableEntity {
     @JoinColumn({ name: 'updated_by' })
     updatedBy?: User;
 
+    @ManyToOne(() => User, { nullable: true })
+    @JoinColumn({ name: 'deleted_by' })
+    deletedBy?: User;
 }

@@ -4,7 +4,7 @@ import { TournamentPlayers } from "src/tournaments/entities/tournament-players.e
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('users')
-export class User {
+export class User extends AuditableEntity{
     @PrimaryGeneratedColumn('increment')
     id: number;
 

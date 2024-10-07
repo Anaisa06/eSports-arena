@@ -5,17 +5,17 @@ export const SwaggerConfig = (app: INestApplication<any>): void => {
     const versionApp = "1.0"
     const config = new DocumentBuilder()
         .setTitle('eSports Arena')
-        .setDescription(`eSports Arema management`)
+        .setDescription(`eSports Arena management`)
         .setVersion(versionApp)   
         .addServer('/api')   
-        // .addBearerAuth(
-        //     {
-        //       type: 'http',
-        //       scheme: 'bearer',
-        //       bearerFormat: 'JWT',
-        //     },
-        //     'access-token'
-        // )
+        .addBearerAuth(
+            {
+              type: 'http',
+              scheme: 'bearer',
+              bearerFormat: 'JWT',
+            },
+            'access-token'
+        )
         .build();
 
     const document = SwaggerModule.createDocument(app, config);
