@@ -17,7 +17,7 @@ export class User {
     @Column()
     password: string;
 
-    @Column({ type: 'enum', enum: Role })
+    @Column({ type: 'enum', enum: Role, default: Role.PLAYER })
     role: Role;
 
     @Column({ nullable: true, name: 'total_points' })
