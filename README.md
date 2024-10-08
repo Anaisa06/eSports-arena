@@ -36,6 +36,7 @@ DB_USERNAME=postgres
 DB_PORT=5437
 
 JWT_SECRET=YourSecret
+X_API_KEY=YourKey
 ```
 ## Available Scripts
 
