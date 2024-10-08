@@ -8,6 +8,8 @@ import { UsersModule } from 'src/users/users.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
+import { JwtStrategy } from './strategy/jwt.strategy';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User]), UsersModule,
@@ -21,6 +23,6 @@ import { PassportModule } from '@nestjs/passport';
   }),
     PassportModule,],
   controllers: [AuthController],
-  providers: [AuthService]
+  providers: [AuthService, JwtAuthGuard, JwtStrategy]
 })
 export class AuthModule { }

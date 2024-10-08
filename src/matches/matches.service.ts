@@ -100,7 +100,7 @@ export class MatchesService {
     const match = await this.findOne(matchId);
 
     const playerOneRegister = await this.tournamentPlayersRepository.update(match.playerOne.id, {points: match.playerOnePoints});
-    if(!playerOneRegister.affected) throw new NotFoundException('Player not found in tournament');
+    if(!playerOneRegister.affected) throw new NotFoundException('Player one not found in tournament');
 
     const playerTwoRegister = await this.tournamentPlayersRepository.update(match.playerTwo.id, {points: match.playerTwoPoints});
     if(!playerTwoRegister.affected) throw new NotFoundException('Player not found in tournament');
@@ -113,11 +113,4 @@ export class MatchesService {
     return match;
   }
 
-  update(id: number, updateMatchDto: UpdateMatchDto) {
-    return `This action updates a #${id} match`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} match`;
-  }
 }

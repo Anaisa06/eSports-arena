@@ -9,6 +9,7 @@ import { UsersService } from 'src/users/users.service';
 import { AddPlayerDto } from './dto/add-player.dto';
 import { MatchesService } from 'src/matches/matches.service';
 import { MatchStates } from 'src/common/enums/match-states.enum';
+import { ResultsService } from 'src/results/results.service';
 
 
 @Injectable()
@@ -17,7 +18,8 @@ export class TournamentsService {
     @InjectRepository(Tournament) private tournamentsRepository: Repository<Tournament>,
     @InjectRepository(TournamentPlayers) private tournamentPlayersRepository: Repository<TournamentPlayers>,
     private usersService: UsersService,
-    private matchesService: MatchesService
+    private matchesService: MatchesService,
+    private resultsService: ResultsService,
   ){}
 
   async create(createTournamentDto: CreateTournamentDto) {
@@ -78,7 +80,7 @@ export class TournamentsService {
   async startTournament(id: number) {
     const tournament = await this.findOne(id);
      
-    if(tournament.hasStarted) throw new BadRequestException(`Tournament ${tournament.name} has already started`);
+    if(tournament.state === MatchStates.PROGRESS) throw new BadRequestException(`Tournament ${tournament.name} has already started`);
 
     const players = await this.getPlayers(id);
 
@@ -86,21 +88,32 @@ export class TournamentsService {
 
     const matches = await this.matchesService.create(tournament, players);
 
-    tournament.hasStarted = true;
+    tournament.state = MatchStates.PROGRESS;
     await this.tournamentsRepository.save(tournament);
 
     return matches;
   }
 
-  async selectWinner(id: number) {
+  async finishTournament(id: number) {
     const tournament = await this.findOne(id);
+
+    if(tournament.state === MatchStates.FINISHED) throw new BadRequestException(`Tournament ${tournament.name} has already finished`)
 
     const matches = await this.matchesService.findAllOrFilter({ tournamentId: tournament.id });
     const unresolvedMatches = matches.find(match => match.state !== MatchStates.FINISHED);
 
     if(unresolvedMatches) throw new BadRequestException('All matches must be finished');
 
+    
+    const players = await this.tournamentPlayersRepository.find({ where: {tournament}, relations:  ['user']});
+    
+    tournament.state = MatchStates.FINISHED;
+    await this.tournamentsRepository.save(tournament);
 
+    const winner = players.reduce((accum, player) => player.points > accum.points ? player : accum);
+    const winnerUser = await this.usersService.findOneById(winner.user.id); 
+
+    return await this.resultsService.create(winnerUser, tournament);
   }
 
 }
