@@ -15,6 +15,7 @@ import { MatchStates } from 'src/common/enums/match-states.enum';
 export class MatchesService {
   constructor(
     @InjectRepository(Match) private matchRepository: Repository<Match>,
+    @InjectRepository(TournamentPlayers) private tournamentPlayersRepository: Repository<TournamentPlayers>,
     @Inject(forwardRef(() => TournamentsService))
     private tournamentService: TournamentsService,
   ) {
@@ -87,11 +88,27 @@ export class MatchesService {
     match.playerOnePoints = points.playerOnePoints;
     match.playerTwoPoints = points.playerTwoPoints;
 
-    return await this.matchRepository.save(match);
+    const finishedMatch = await this.matchRepository.save(match);
+
+    await this.assignPoints(finishedMatch.id);
+
+    return finishedMatch;
+  }
+
+  private async assignPoints(matchId: number) {
+
+    const match = await this.findOne(matchId);
+
+    const playerOneRegister = await this.tournamentPlayersRepository.update(match.playerOne.id, {points: match.playerOnePoints});
+    if(!playerOneRegister.affected) throw new NotFoundException('Player not found in tournament');
+
+    const playerTwoRegister = await this.tournamentPlayersRepository.update(match.playerTwo.id, {points: match.playerTwoPoints});
+    if(!playerTwoRegister.affected) throw new NotFoundException('Player not found in tournament');
+
   }
 
   async findOne(id: number) {
-    const match = await this.matchRepository.findOne({ where: {id}});
+    const match = await this.matchRepository.findOne({ where: {id}, relations: ['playerOne', 'playerTwo']});
     if(!match) throw new NotFoundException(`Match with id ${id} was not found`);
     return match;
   }

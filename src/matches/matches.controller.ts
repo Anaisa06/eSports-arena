@@ -1,6 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { MatchesService } from './matches.service';
-import { CreateMatchDto } from './dto/create-match.dto';
 import { UpdateMatchDto } from './dto/update-match.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { MatchQueryDto } from './dto/match-query.dto';
@@ -26,13 +25,13 @@ export class MatchesController {
     return this.matchesService.completeMatch(+id, finishMatchDto)
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMatchDto: UpdateMatchDto) {
-    return this.matchesService.update(+id, updateMatchDto);
-  }
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updateMatchDto: UpdateMatchDto) {
+  //   return this.matchesService.update(+id, updateMatchDto);
+  // }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.matchesService.remove(+id);
-  }
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.matchesService.remove(+id);
+  // }
 }

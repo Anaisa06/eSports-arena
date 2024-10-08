@@ -8,6 +8,7 @@ import { TournamentPlayers } from './entities/tournament-players.entity';
 import { UsersService } from 'src/users/users.service';
 import { AddPlayerDto } from './dto/add-player.dto';
 import { MatchesService } from 'src/matches/matches.service';
+import { MatchStates } from 'src/common/enums/match-states.enum';
 
 
 @Injectable()
@@ -90,4 +91,16 @@ export class TournamentsService {
 
     return matches;
   }
+
+  async selectWinner(id: number) {
+    const tournament = await this.findOne(id);
+
+    const matches = await this.matchesService.findAllOrFilter({ tournamentId: tournament.id });
+    const unresolvedMatches = matches.find(match => match.state !== MatchStates.FINISHED);
+
+    if(unresolvedMatches) throw new BadRequestException('All matches must be finished');
+
+
+  }
+
 }
