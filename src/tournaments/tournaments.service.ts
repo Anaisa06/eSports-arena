@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTournamentDto } from './dto/create-tournament.dto';
 import { UpdateTournamentDto } from './dto/update-tournament.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { TournamentPlayers } from './entities/tournament-players.entity';
 import { UsersService } from 'src/users/users.service';
 import { AddPlayerDto } from './dto/add-player.dto';
+import { MatchesService } from 'src/matches/matches.service';
 
 
 @Injectable()
@@ -15,6 +16,7 @@ export class TournamentsService {
     @InjectRepository(Tournament) private tournamentsRepository: Repository<Tournament>,
     @InjectRepository(TournamentPlayers) private tournamentPlayersRepository: Repository<TournamentPlayers>,
     private usersService: UsersService,
+    private matchesService: MatchesService
   ){}
 
   async create(createTournamentDto: CreateTournamentDto) {
@@ -31,7 +33,7 @@ export class TournamentsService {
   }
 
   async findOne(id: number) {
-    const tournament = await this.tournamentsRepository.findOne({ where: {id}});
+    const tournament = await this.tournamentsRepository.findOne({ where: {id}, relations: ['players']});
     if(!tournament) throw new NotFoundException(`Tournament with id ${id} was not found`);
     return tournament;
   }
@@ -39,6 +41,10 @@ export class TournamentsService {
   async addPlayer(id: number, addPlayerDto: AddPlayerDto) {
     const tournament = await this.findOne(id);
     const user = await this.usersService.findOneById(addPlayerDto.userId);
+
+    const existingPlayer = await this.tournamentPlayersRepository.findOne({ where: {user, tournament}});
+
+    if(existingPlayer) throw new ConflictException(`User with id ${addPlayerDto.userId} is already registered in the tournament ${tournament.name}`);
 
     const newTournamentPlayer = this.tournamentPlayersRepository.create({tournament, user});
 
@@ -60,5 +66,28 @@ export class TournamentsService {
     await this.tournamentsRepository.softDelete(id);
 
     return tournament;    
+  }
+
+  async getPlayers(id: number) {
+    const tournament = await this.findOne(id);
+    const players = await this.tournamentPlayersRepository.find({ where: { tournament }, relations: ['user']});
+    return players;
+  }
+
+  async startTournament(id: number) {
+    const tournament = await this.findOne(id);
+     
+    if(tournament.hasStarted) throw new BadRequestException(`Tournament ${tournament.name} has already started`);
+
+    const players = await this.getPlayers(id);
+
+    if(players.length%2 !== 0) throw new BadRequestException('The number of players must be even');
+
+    const matches = await this.matchesService.create(tournament, players);
+
+    tournament.hasStarted = true;
+    await this.tournamentsRepository.save(tournament);
+
+    return matches;
   }
 }

@@ -14,6 +14,9 @@ export class Tournament extends AuditableEntity {
     @Column()
     date: Date;
 
+    @Column({type: 'boolean', default: false})
+    hasStarted: boolean;
+
     @OneToMany(() => TournamentPlayers, (tournamentPlayers) => tournamentPlayers.tournament)
     players: TournamentPlayers[]
 
