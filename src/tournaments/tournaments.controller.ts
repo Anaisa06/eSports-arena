@@ -24,6 +24,11 @@ export class TournamentsController {
     return this.tournamentsService.create(createTournamentDto);
   }
 
+  @Patch('finish/:id')
+  finishTournament(@Param('id') id:string) {
+    return this.tournamentsService.finishTournament(+id)
+  }
+
 
   @Get()
   findAll() {

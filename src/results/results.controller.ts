@@ -1,36 +1,20 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { ResultsService } from './results.service';
-import { CreateResultDto } from './dto/create-result.dto';
-import { UpdateResultDto } from './dto/update-result.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { ResultsQueryDto } from './dto/results-query.dto';
 
 @ApiTags('Results')
 @Controller('results')
 export class ResultsController {
   constructor(private readonly resultsService: ResultsService) {}
 
-  @Post()
-  create(@Body() createResultDto: CreateResultDto) {
-    return this.resultsService.create(createResultDto);
-  }
-
   @Get()
-  findAll() {
-    return this.resultsService.findAll();
+  findAllOrFilter(@Query() query: ResultsQueryDto) {
+    return this.resultsService.findAllOrFilter(query);
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.resultsService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateResultDto: UpdateResultDto) {
-    return this.resultsService.update(+id, updateResultDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.resultsService.remove(+id);
   }
 }
