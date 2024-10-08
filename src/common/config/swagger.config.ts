@@ -16,6 +16,14 @@ export const SwaggerConfig = (app: INestApplication<any>): void => {
             },
             'access-token'
         )
+        .addApiKey(
+            { 
+              type: 'apiKey', 
+              name: 'x-api-key', 
+              in: 'header' 
+            },
+            'x-api-key', // Nombre del esquema de seguridad
+          )
         .build();
 
     const document = SwaggerModule.createDocument(app, config);
