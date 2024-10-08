@@ -1,22 +1,18 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { MatchesService } from './matches.service';
-import { CreateMatchDto } from './dto/create-match.dto';
 import { UpdateMatchDto } from './dto/update-match.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { MatchQueryDto } from './dto/match-query.dto';
+import { FinishMatchDto } from './dto/finish-match.dto';
 
 @ApiTags('Matches')
 @Controller('matches')
 export class MatchesController {
   constructor(private readonly matchesService: MatchesService) {}
 
-  @Post()
-  create(@Body() createMatchDto: CreateMatchDto) {
-    return this.matchesService.create(createMatchDto);
-  }
-
   @Get()
-  findAll() {
-    return this.matchesService.findAll();
+  findAllOrFilter(@Query() query: MatchQueryDto) {
+    return this.matchesService.findAllOrFilter(query);
   }
 
   @Get(':id')
@@ -24,13 +20,18 @@ export class MatchesController {
     return this.matchesService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMatchDto: UpdateMatchDto) {
-    return this.matchesService.update(+id, updateMatchDto);
+  @Patch('finish/:id')
+  finishMatch(@Param('id') id: string, @Body() finishMatchDto: FinishMatchDto) {
+    return this.matchesService.completeMatch(+id, finishMatchDto)
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.matchesService.remove(+id);
-  }
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updateMatchDto: UpdateMatchDto) {
+  //   return this.matchesService.update(+id, updateMatchDto);
+  // }
+
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.matchesService.remove(+id);
+  // }
 }

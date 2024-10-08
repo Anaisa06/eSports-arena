@@ -14,6 +14,11 @@ export class TournamentsController {
     return this.tournamentsService.addPlayer(+id, addPlayerDto)
   }
 
+  @Post('start/:id')
+  startTournament(@Param('id') id: string) {
+    return this.tournamentsService.startTournament(+id);
+  }
+
   @Post()
   create(@Body() createTournamentDto: CreateTournamentDto) {
     return this.tournamentsService.create(createTournamentDto);
