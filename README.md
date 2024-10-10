@@ -116,4 +116,4 @@ npm run format
 
 ## The API documentation is automatically generated using Swagger. To access the documentation, start the application and navigate to [/api/v1/docs](http://localhost:3001/api/v1/docs#/) in your browser.
 
-## Also, to see the deployed version of Swagger you can navigate to http://137.184.109.102:3000/api/v1/docs.
+## Also, to see the deployed version of Swagger you can navigate to http://137.184.109.102:3000/api/v1/docs. Remember to use the x-api-key header with the value D45%&a$90.
